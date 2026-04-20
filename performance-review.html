@@ -1,0 +1,1474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Performance Review</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&family=Fraunces:opsz,wght@9..144,500;9..144,600&display=swap" rel="stylesheet" />
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    /* Paper palette */
+    --bg: #F5F2EA;
+    --bg-grad: radial-gradient(1200px 600px at 50% -200px, #FBF8F0 0%, #F5F2EA 50%, #EFEBE0 100%);
+    --surface: #FFFFFF;
+    --surface-warm: #FBF9F4;
+    --surface2: #F0EDE4;
+    --border: #E5E0D4;
+    --border2: #CFC9BA;
+    --border-strong: #A9A296;
+
+    /* Text */
+    --text: #141310;
+    --text2: #5E5A52;
+    --text3: #928E85;
+    --text-inv: #FBF9F4;
+
+    /* Brand */
+    --accent: #1E4A37;
+    --accent-hover: #163A2B;
+    --accent-light: #E6EFE9;
+    --accent-text: #143528;
+    --accent-border: #B5CEBE;
+    --accent-soft: #F2F7F3;
+
+    /* Semantic */
+    --gold: #B8844D;
+    --gold-light: #F5EBDA;
+    --warn: #7A4F1A;
+    --warn-light: #FAEDD7;
+    --warn-border: #EBC89E;
+    --info: #274B6D;
+    --info-light: #E6EDF4;
+    --danger: #6B1F1F;
+    --danger-light: #F7E5E5;
+    --danger-border: #E5B3B3;
+
+    /* Rating scale colors */
+    --r1: #8B3030; --r1-bg: #F7E5E5;
+    --r2: #9A5B22; --r2-bg: #F7E9D3;
+    --r3: #274B6D; --r3-bg: #E6EDF4;
+    --r4: #2E6348; --r4-bg: #E1EDE5;
+    --r5: #1B4A34; --r5-bg: #D6E8DC;
+
+    /* Depth */
+    --radius: 14px; --radius-md: 10px; --radius-sm: 7px;
+    --shadow-xs: 0 1px 2px rgba(26,22,16,0.05);
+    --shadow-sm: 0 1px 3px rgba(26,22,16,0.06), 0 1px 2px rgba(26,22,16,0.04);
+    --shadow: 0 2px 6px rgba(26,22,16,0.05), 0 4px 12px rgba(26,22,16,0.04);
+    --shadow-lg: 0 8px 32px rgba(26,22,16,0.08), 0 2px 6px rgba(26,22,16,0.04);
+    --ring: 0 0 0 3px rgba(30,74,55,0.15);
+
+    /* Motion */
+    --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+  }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    background-image: var(--bg-grad);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 36px 16px 100px;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  .container { max-width: 880px; margin: 0 auto; }
+
+  /* ---------- Header ---------- */
+  .hero { margin-bottom: 28px; }
+  .hero-pill {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 5px 12px 5px 8px;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 999px; font-size: 12px; font-weight: 500; color: var(--text2);
+    box-shadow: var(--shadow-xs); margin-bottom: 14px;
+  }
+  .hero-pill .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+  .hero h1 {
+    font-family: 'Fraunces', 'DM Sans', serif;
+    font-weight: 600; font-size: 40px; line-height: 1.05;
+    letter-spacing: -1.2px; margin-bottom: 10px;
+  }
+  .hero h1 .em { font-style: italic; color: var(--accent); font-weight: 500; }
+  .hero p { font-size: 15px; color: var(--text2); line-height: 1.6; max-width: 620px; }
+  .hero-stats {
+    display: flex; gap: 24px; margin-top: 18px; padding-top: 18px;
+    border-top: 1px solid var(--border); font-size: 13px;
+  }
+  .hero-stats .hs { display: flex; flex-direction: column; gap: 2px; }
+  .hero-stats .hs b { font-family: 'DM Mono', monospace; font-size: 15px; color: var(--text); font-weight: 500; }
+  .hero-stats .hs span { color: var(--text3); font-size: 12px; letter-spacing: 0.03em; text-transform: uppercase; }
+
+  /* ---------- Tabs ---------- */
+  .tab-bar {
+    display: flex; background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius-md); padding: 5px; margin-bottom: 20px; gap: 4px;
+    box-shadow: var(--shadow-xs);
+  }
+  .tab {
+    flex: 1; padding: 10px 16px; font-size: 13px; font-weight: 500;
+    border: none; background: transparent; color: var(--text2);
+    border-radius: 7px; cursor: pointer; transition: all 0.2s var(--ease);
+    font-family: inherit; display: inline-flex; align-items: center; justify-content: center; gap: 7px;
+  }
+  .tab:hover { color: var(--text); }
+  .tab.active { background: var(--surface2); color: var(--text); box-shadow: var(--shadow-xs); }
+  .tab svg { width: 14px; height: 14px; stroke: currentColor; stroke-width: 1.8; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+  .panel { display: none; animation: fadeIn 0.3s var(--ease); }
+  .panel.active { display: block; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* ---------- Stepper ---------- */
+  .stepper {
+    display: flex; align-items: center; gap: 10px; padding: 14px 18px;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius-md); margin-bottom: 14px; box-shadow: var(--shadow-xs);
+    overflow-x: auto;
+  }
+  .step { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+  .step .dot {
+    width: 22px; height: 22px; border-radius: 50%;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 600; font-family: 'DM Mono', monospace;
+    background: var(--surface2); color: var(--text3); border: 1px solid var(--border);
+    transition: all 0.25s var(--ease);
+  }
+  .step.done .dot { background: var(--accent); color: var(--text-inv); border-color: var(--accent); }
+  .step.active .dot { background: var(--accent); color: var(--text-inv); border-color: var(--accent); box-shadow: var(--ring); }
+  .step .lbl { font-size: 12px; font-weight: 500; color: var(--text2); white-space: nowrap; }
+  .step.done .lbl, .step.active .lbl { color: var(--text); }
+  .step .sep { width: 28px; height: 1px; background: var(--border); margin: 0 4px; flex-shrink: 0; }
+  .step.done + .step .sep, .stepper .step.done .sep { background: var(--accent); }
+
+  /* ---------- Cards ---------- */
+  .card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 26px 28px; margin-bottom: 14px;
+    box-shadow: var(--shadow-sm);
+    animation: rise 0.35s var(--ease);
+  }
+  @keyframes rise { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+  .card-head { display: flex; align-items: flex-start; gap: 14px; margin-bottom: 18px; }
+  .card-head .num {
+    width: 30px; height: 30px; border-radius: 8px; flex-shrink: 0;
+    background: var(--accent-soft); color: var(--accent-text);
+    display: inline-flex; align-items: center; justify-content: center;
+    font-family: 'DM Mono', monospace; font-size: 13px; font-weight: 600;
+    border: 1px solid var(--accent-border);
+  }
+  .card-head .tx { flex: 1; }
+  .card-head h3 { font-size: 16px; font-weight: 600; letter-spacing: -0.2px; margin-bottom: 2px; }
+  .card-head p { font-size: 13px; color: var(--text2); line-height: 1.5; }
+  .card-head .ic {
+    width: 38px; height: 38px; border-radius: 10px; flex-shrink: 0;
+    background: var(--accent-soft); border: 1px solid var(--accent-border);
+    display: inline-flex; align-items: center; justify-content: center;
+    color: var(--accent);
+  }
+  .card-head .ic svg { width: 18px; height: 18px; stroke: currentColor; stroke-width: 1.7; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+
+  /* ---------- Form fields ---------- */
+  .field { margin-bottom: 14px; } .field:last-child { margin-bottom: 0; }
+  .field label {
+    display: block; font-size: 12px; font-weight: 500;
+    color: var(--text2); margin-bottom: 6px; letter-spacing: 0.01em;
+  }
+  .field input, .field select, .field textarea {
+    width: 100%; padding: 10px 13px;
+    border: 1px solid var(--border2); border-radius: var(--radius-sm);
+    background: var(--surface); color: var(--text);
+    font-size: 14px; font-family: inherit; line-height: 1.5;
+    transition: border-color 0.15s, box-shadow 0.15s, background 0.15s;
+    appearance: none; -webkit-appearance: none;
+  }
+  .field input, .field select { height: 42px; padding: 0 13px; }
+  .field textarea { min-height: 74px; resize: vertical; padding: 10px 13px; }
+  .field select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%239E9B96' stroke-width='1.6' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: right 13px center; padding-right: 34px;
+    cursor: pointer;
+  }
+  .field input:hover, .field select:hover, .field textarea:hover { border-color: var(--border-strong); }
+  .field input:focus, .field select:focus, .field textarea:focus {
+    outline: none; border-color: var(--accent); box-shadow: var(--ring);
+  }
+  .field input::placeholder, .field textarea::placeholder { color: var(--text3); }
+
+  /* Compound email field: [ username ][ @luckmans.com ] */
+  .email-compound {
+    display: flex; align-items: stretch; height: 42px;
+    border: 1px solid var(--border2); border-radius: var(--radius-sm);
+    background: var(--surface); overflow: hidden;
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+  .email-compound:hover { border-color: var(--border-strong); }
+  .email-compound:focus-within { border-color: var(--accent); box-shadow: var(--ring); }
+  .email-compound input {
+    flex: 1; min-width: 0; height: 100%; padding: 0 13px;
+    border: none; background: transparent; color: var(--text);
+    font-size: 14px; font-family: inherit; outline: none;
+  }
+  .email-compound input::placeholder { color: var(--text3); }
+  .email-suffix {
+    display: inline-flex; align-items: center; padding: 0 14px;
+    font-size: 13.5px; color: var(--text2);
+    background: var(--surface2); border-left: 1px solid var(--border);
+    font-family: 'DM Mono', monospace; letter-spacing: 0.01em;
+    white-space: nowrap;
+  }
+  .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .field-row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+
+  /* ---------- Role selector ---------- */
+  .role-bar { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .role-btn {
+    padding: 18px 20px; border: 1px solid var(--border2);
+    background: var(--surface); border-radius: var(--radius-md);
+    cursor: pointer; font-family: inherit; text-align: left;
+    transition: all 0.2s var(--ease);
+    display: flex; gap: 14px; align-items: flex-start;
+  }
+  .role-btn:hover { border-color: var(--border-strong); transform: translateY(-1px); box-shadow: var(--shadow-sm); }
+  .role-btn.active { border-color: var(--accent); background: var(--accent-soft); box-shadow: var(--ring); }
+  .role-btn .ric {
+    width: 40px; height: 40px; border-radius: 10px; flex-shrink: 0;
+    background: var(--surface2); border: 1px solid var(--border);
+    display: inline-flex; align-items: center; justify-content: center;
+    color: var(--text2); transition: all 0.2s var(--ease);
+  }
+  .role-btn .ric svg { width: 20px; height: 20px; stroke: currentColor; stroke-width: 1.6; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+  .role-btn.active .ric { background: var(--accent); border-color: var(--accent); color: var(--text-inv); }
+  .role-btn .rc { flex: 1; }
+  .role-btn .rt { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 3px; }
+  .role-btn .rd { font-size: 12px; color: var(--text2); line-height: 1.5; }
+  .role-btn.active .rt { color: var(--accent-text); }
+
+  /* ---------- Objectives ---------- */
+  .obj-block {
+    border: 1px solid var(--border); border-radius: var(--radius-md);
+    padding: 16px 18px; margin-bottom: 10px; background: var(--surface-warm);
+    transition: border-color 0.15s;
+  }
+  .obj-block:hover { border-color: var(--border-strong); }
+  .obj-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+  .obj-num {
+    display: inline-flex; align-items: center; gap: 7px;
+    font-size: 11px; font-weight: 600; letter-spacing: 0.06em;
+    text-transform: uppercase; color: var(--text3);
+  }
+  .obj-num .chip {
+    width: 20px; height: 20px; border-radius: 5px;
+    background: var(--accent-soft); color: var(--accent-text);
+    display: inline-flex; align-items: center; justify-content: center;
+    font-family: 'DM Mono', monospace; font-size: 11px; font-weight: 600;
+    border: 1px solid var(--accent-border);
+  }
+  .obj-remove {
+    background: none; border: none; color: var(--text3); cursor: pointer;
+    font-size: 12px; font-family: inherit; padding: 4px 8px; border-radius: 5px;
+    transition: all 0.12s; display: inline-flex; align-items: center; gap: 4px;
+  }
+  .obj-remove:hover { color: var(--danger); background: var(--danger-light); }
+  .obj-remove svg { width: 12px; height: 12px; stroke: currentColor; stroke-width: 1.8; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+
+  .btn-add {
+    display: inline-flex; align-items: center; gap: 7px;
+    padding: 9px 14px; font-size: 12px; font-weight: 500;
+    background: transparent; border: 1px dashed var(--border2);
+    border-radius: var(--radius-sm); cursor: pointer;
+    font-family: inherit; color: var(--text2); transition: all 0.12s;
+    margin-top: 4px;
+  }
+  .btn-add:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-soft); }
+  .btn-add svg { width: 12px; height: 12px; stroke: currentColor; stroke-width: 2; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+
+  /* ---------- Rating scale callout ---------- */
+  .scale-card {
+    background: var(--surface-warm); border: 1px solid var(--border);
+    border-radius: var(--radius-md); padding: 14px 16px; margin-bottom: 16px;
+  }
+  .scale-title { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text3); margin-bottom: 10px; }
+  .scale-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
+  .scale-item { padding: 8px 10px; border-radius: var(--radius-sm); font-size: 12px; line-height: 1.3; }
+  .scale-item .n { font-family: 'DM Mono', monospace; font-weight: 600; font-size: 14px; display: block; margin-bottom: 2px; }
+  .scale-item[data-r="1"] { background: var(--r1-bg); color: var(--r1); }
+  .scale-item[data-r="2"] { background: var(--r2-bg); color: var(--r2); }
+  .scale-item[data-r="3"] { background: var(--r3-bg); color: var(--r3); }
+  .scale-item[data-r="4"] { background: var(--r4-bg); color: var(--r4); }
+  .scale-item[data-r="5"] { background: var(--r5-bg); color: var(--r5); }
+
+  .callout-warn {
+    display: flex; gap: 10px; align-items: flex-start;
+    padding: 10px 14px; border-radius: var(--radius-sm);
+    background: var(--warn-light); border: 1px solid var(--warn-border);
+    color: var(--warn); font-size: 12.5px; line-height: 1.5; margin-bottom: 16px;
+  }
+  .callout-warn svg { width: 14px; height: 14px; stroke: currentColor; stroke-width: 1.8; fill: none; flex-shrink: 0; margin-top: 2px; }
+
+  /* ---------- Parameter rating row ---------- */
+  .param-row {
+    padding: 20px 0; border-bottom: 1px solid var(--border);
+  }
+  .param-row:first-child { padding-top: 4px; }
+  .param-row:last-child { border-bottom: none; padding-bottom: 4px; }
+  .param-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 14px; margin-bottom: 12px; }
+  .param-name { font-size: 14.5px; font-weight: 600; color: var(--text); display: flex; align-items: center; gap: 8px; }
+  .param-name .pnum {
+    width: 22px; height: 22px; border-radius: 6px; font-size: 11px;
+    font-family: 'DM Mono', monospace; font-weight: 600;
+    background: var(--surface2); color: var(--text3); border: 1px solid var(--border);
+    display: inline-flex; align-items: center; justify-content: center;
+  }
+  .param-hint { font-size: 12.5px; color: var(--text2); line-height: 1.55; margin-top: 4px; max-width: 560px; }
+  .param-weight {
+    font-size: 11px; font-family: 'DM Mono', monospace; color: var(--text2); white-space: nowrap;
+    padding: 3px 10px; background: var(--surface-warm);
+    border: 1px solid var(--border); border-radius: 999px;
+  }
+  .param-weight.big { background: var(--accent-soft); border-color: var(--accent-border); color: var(--accent-text); font-weight: 600; }
+
+  .rating-seg { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-bottom: 10px; }
+  .rating-btn {
+    height: 46px; border: 1px solid var(--border2); background: var(--surface);
+    color: var(--text2); border-radius: var(--radius-sm); cursor: pointer;
+    font-family: 'DM Mono', monospace; font-size: 15px; font-weight: 500;
+    transition: all 0.15s var(--ease); position: relative;
+    display: inline-flex; align-items: center; justify-content: center;
+  }
+  .rating-btn:hover { border-color: var(--border-strong); color: var(--text); transform: translateY(-1px); }
+  .rating-btn.active { border-color: currentColor; font-weight: 600; transform: translateY(-1px); box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+  .rating-btn.active[data-val="1"] { color: var(--r1); background: var(--r1-bg); }
+  .rating-btn.active[data-val="2"] { color: var(--r2); background: var(--r2-bg); }
+  .rating-btn.active[data-val="3"] { color: var(--r3); background: var(--r3-bg); }
+  .rating-btn.active[data-val="4"] { color: var(--r4); background: var(--r4-bg); }
+  .rating-btn.active[data-val="5"] { color: var(--r5); background: var(--r5-bg); }
+
+  .just-box { width: 100%; }
+  .just-box textarea {
+    width: 100%; display: block;
+    min-height: 72px; padding: 10px 13px;
+    border: 1px solid var(--border2); border-radius: var(--radius-sm);
+    background: var(--surface); color: var(--text);
+    font-size: 13px; font-family: inherit; line-height: 1.55;
+    transition: border-color 0.15s, box-shadow 0.15s;
+    resize: vertical; appearance: none; -webkit-appearance: none;
+    box-sizing: border-box;
+  }
+  .just-box textarea:hover { border-color: var(--border-strong); }
+  .just-box textarea:focus { outline: none; border-color: var(--accent); box-shadow: var(--ring); }
+  .just-box textarea::placeholder { color: var(--text3); }
+  .just-req {
+    display: none; font-size: 11.5px; color: var(--warn); margin-top: 6px;
+    padding: 6px 10px; background: var(--warn-light); border-radius: var(--radius-sm);
+  }
+  .just-req.show { display: inline-block; }
+
+  /* ---------- Overall rating hero card ---------- */
+  .overall-card {
+    background: linear-gradient(135deg, #1E4A37 0%, #163A2B 100%);
+    border-radius: var(--radius); padding: 28px 32px; margin-bottom: 14px;
+    color: var(--text-inv); box-shadow: var(--shadow-lg);
+    display: grid; grid-template-columns: auto 1fr; gap: 28px; align-items: center;
+    position: relative; overflow: hidden;
+  }
+  .overall-card::before {
+    content: ''; position: absolute; top: -80px; right: -80px;
+    width: 260px; height: 260px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(184,132,77,0.15) 0%, rgba(184,132,77,0) 70%);
+  }
+  .overall-gauge {
+    position: relative; width: 120px; height: 120px; flex-shrink: 0;
+  }
+  .overall-gauge svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+  .overall-gauge .bg-ring { stroke: rgba(255,255,255,0.12); stroke-width: 10; fill: none; }
+  .overall-gauge .fg-ring { stroke: var(--gold); stroke-width: 10; fill: none; stroke-linecap: round; transition: stroke-dasharray 0.6s var(--ease); }
+  .overall-gauge .num {
+    position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+    font-family: 'Fraunces', serif; font-weight: 600; font-size: 32px; color: var(--text-inv);
+    letter-spacing: -1px;
+  }
+  .overall-body .lbl { font-size: 11px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(255,255,255,0.55); margin-bottom: 4px; }
+  .overall-body h2 { font-family: 'Fraunces', serif; font-weight: 500; font-size: 24px; letter-spacing: -0.4px; margin-bottom: 6px; }
+  .overall-body .desc { font-size: 13.5px; color: rgba(255,255,255,0.78); line-height: 1.55; max-width: 420px; }
+  .overall-band {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 4px 10px; background: rgba(255,255,255,0.10); color: var(--gold);
+    border: 1px solid rgba(184,132,77,0.3); border-radius: 999px;
+    font-size: 11px; font-weight: 500; letter-spacing: 0.03em; margin-bottom: 10px;
+  }
+
+  /* ---------- Primary button & alerts ---------- */
+  .submit-wrap { position: relative; margin-top: 6px; }
+  .btn-primary {
+    width: 100%; height: 50px; background: var(--accent); color: var(--text-inv);
+    border: none; border-radius: var(--radius-md); font-size: 14.5px; font-weight: 600;
+    font-family: inherit; cursor: pointer;
+    transition: all 0.18s var(--ease); position: relative;
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    letter-spacing: 0.01em;
+    box-shadow: 0 4px 12px rgba(30,74,55,0.18), 0 1px 3px rgba(30,74,55,0.12);
+  }
+  .btn-primary:hover { background: var(--accent-hover); transform: translateY(-1px); box-shadow: 0 6px 18px rgba(30,74,55,0.22), 0 2px 6px rgba(30,74,55,0.12); }
+  .btn-primary:active { transform: translateY(0); }
+  .btn-primary:disabled { opacity: 0.55; cursor: not-allowed; transform: none; }
+  .btn-primary svg { width: 15px; height: 15px; stroke: currentColor; stroke-width: 2; fill: none; }
+
+  .alert {
+    border-radius: var(--radius-md); padding: 13px 17px; font-size: 13px; font-weight: 500;
+    margin-top: 12px; display: none; align-items: flex-start; gap: 10px;
+    line-height: 1.5;
+  }
+  .alert.show { display: flex; }
+  .alert svg { width: 16px; height: 16px; stroke: currentColor; stroke-width: 1.8; fill: none; flex-shrink: 0; margin-top: 1px; }
+  .alert-success { background: var(--accent-light); color: var(--accent-text); border: 1px solid var(--accent-border); }
+  .alert-error { background: var(--danger-light); color: var(--danger); border: 1px solid var(--danger-border); }
+
+  /* ---------- Results ---------- */
+  .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 22px; }
+  .stat-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius-md); padding: 16px 18px;
+    box-shadow: var(--shadow-xs); position: relative; overflow: hidden;
+  }
+  .stat-val { font-size: 30px; font-weight: 600; color: var(--text); font-family: 'Fraunces', serif; line-height: 1; letter-spacing: -0.6px; }
+  .stat-lbl { font-size: 11.5px; color: var(--text2); margin-top: 6px; letter-spacing: 0.02em; }
+
+  .results-toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; gap: 10px; flex-wrap: wrap; }
+  .results-toolbar h3 { font-size: 16px; font-weight: 600; letter-spacing: -0.2px; }
+  .toolbar-right { display: flex; gap: 8px; flex: 1; max-width: 420px; }
+  .filter-input {
+    flex: 1; min-width: 180px; height: 38px; padding: 0 13px;
+    border: 1px solid var(--border2); border-radius: var(--radius-sm);
+    font-family: inherit; font-size: 13px; background: var(--surface);
+  }
+  .filter-input:focus { outline: none; border-color: var(--accent); box-shadow: var(--ring); }
+  .btn-export {
+    padding: 8px 14px; font-size: 12px; font-weight: 500;
+    background: var(--surface); border: 1px solid var(--border2);
+    border-radius: var(--radius-sm); cursor: pointer; font-family: inherit;
+    color: var(--text); transition: all 0.12s;
+    display: inline-flex; align-items: center; gap: 6px; white-space: nowrap;
+  }
+  .btn-export:hover { background: var(--surface2); border-color: var(--border-strong); }
+  .btn-export svg { width: 13px; height: 13px; stroke: currentColor; stroke-width: 1.8; fill: none; }
+
+  .resp-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 20px 22px; margin-bottom: 12px;
+    box-shadow: var(--shadow-xs); transition: box-shadow 0.2s var(--ease), border-color 0.2s;
+  }
+  .resp-card:hover { box-shadow: var(--shadow-sm); border-color: var(--border-strong); }
+  .resp-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 4px; }
+  .resp-id { display: flex; align-items: center; gap: 11px; }
+  .avatar {
+    width: 36px; height: 36px; border-radius: 10px; flex-shrink: 0;
+    background: var(--accent-soft); color: var(--accent-text);
+    display: inline-flex; align-items: center; justify-content: center;
+    font-family: 'DM Mono', monospace; font-weight: 600; font-size: 13px;
+    border: 1px solid var(--accent-border); text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .avatar.mgr { background: #EFEAD9; color: var(--gold); border-color: #E2D6B5; }
+  .resp-name { font-size: 15px; font-weight: 600; color: var(--text); }
+  .resp-time { font-size: 11px; color: var(--text3); font-family: 'DM Mono', monospace; white-space: nowrap; }
+  .resp-meta { font-size: 12.5px; color: var(--text2); margin-top: 2px; margin-left: 47px; }
+  .resp-meta span { padding: 0 6px; color: var(--text3); }
+  .resp-meta span:first-child { display: none; }
+  .resp-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px; margin-left: 47px; }
+  .badge {
+    display: inline-flex; align-items: center; gap: 5px;
+    font-size: 11px; font-weight: 500; padding: 3px 10px;
+    border-radius: 999px; letter-spacing: 0.02em;
+    border: 1px solid transparent;
+  }
+  .badge-self { background: var(--info-light); color: var(--info); border-color: #C8D6E3; }
+  .badge-mgr { background: var(--accent-light); color: var(--accent-text); border-color: var(--accent-border); }
+  .badge-rating { font-family: 'DM Mono', monospace; background: var(--gold-light); color: var(--gold); border-color: #E2D6B5; font-weight: 600; }
+  .resp-section { margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--border); }
+  .resp-section h4 { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text3); margin-bottom: 10px; }
+
+  .obj-tbl, .rating-tbl { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .obj-tbl th, .rating-tbl th {
+    text-align: left; color: var(--text3); font-weight: 500;
+    padding: 7px 10px; border-bottom: 1px solid var(--border);
+    font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em;
+  }
+  .obj-tbl td, .rating-tbl td {
+    padding: 8px 10px; border-bottom: 1px solid var(--border);
+    color: var(--text); vertical-align: top;
+  }
+  .obj-tbl tr:last-child td, .rating-tbl tr:last-child td { border-bottom: none; }
+  .status-pill {
+    display: inline-flex; font-size: 11px; font-weight: 500;
+    padding: 2px 9px; border-radius: 999px; letter-spacing: 0.02em;
+  }
+  .status-pill[data-s="Achieved"] { background: var(--accent-light); color: var(--accent-text); }
+  .status-pill[data-s="Partially Achieved"] { background: var(--gold-light); color: var(--gold); }
+  .status-pill[data-s="Not Achieved"] { background: var(--danger-light); color: var(--danger); }
+
+  .qa-list { font-size: 13px; color: var(--text); line-height: 1.55; }
+  .qa-list .qa-item { margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px dashed var(--border); }
+  .qa-list .qa-item:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+  .qa-list .q { color: var(--text3); font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.04em; font-weight: 500; margin-bottom: 4px; }
+  .qa-list .a { color: var(--text); }
+
+  /* Radar chart */
+  .mgr-layout { display: grid; grid-template-columns: 1fr 200px; gap: 20px; align-items: start; }
+  .radar-wrap {
+    background: var(--surface-warm); border: 1px solid var(--border);
+    border-radius: var(--radius-md); padding: 14px 14px 10px;
+    text-align: center;
+  }
+  .radar-wrap svg { width: 100%; height: auto; max-width: 170px; display: block; margin: 0 auto; }
+  .radar-wrap .cap { font-size: 10.5px; color: var(--text3); margin-top: 6px; letter-spacing: 0.03em; text-transform: uppercase; }
+
+  /* ---------- Lock screen ---------- */
+  .lock-screen {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 44px 32px;
+    box-shadow: var(--shadow-sm); text-align: center;
+    max-width: 440px; margin: 24px auto;
+  }
+  .lock-icon {
+    width: 56px; height: 56px; border-radius: 14px; margin: 0 auto 18px;
+    background: var(--accent-soft); border: 1px solid var(--accent-border);
+    display: inline-flex; align-items: center; justify-content: center;
+    color: var(--accent);
+  }
+  .lock-icon svg { width: 26px; height: 26px; stroke: currentColor; stroke-width: 1.6; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+  .lock-screen h3 {
+    font-family: 'Fraunces', serif; font-weight: 500; font-size: 22px;
+    letter-spacing: -0.3px; margin-bottom: 6px;
+  }
+  .lock-screen p { font-size: 13.5px; color: var(--text2); line-height: 1.55; margin-bottom: 22px; }
+  .lock-form { display: flex; flex-direction: column; gap: 10px; text-align: left; }
+  .lock-input-wrap { position: relative; }
+  .lock-form input[type="password"], .lock-form input[type="text"] {
+    width: 100%; height: 44px; padding: 0 44px 0 14px;
+    border: 1px solid var(--border2); border-radius: var(--radius-sm);
+    background: var(--surface); color: var(--text);
+    font-size: 14px; font-family: inherit;
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+  .lock-form input:focus { outline: none; border-color: var(--accent); box-shadow: var(--ring); }
+  .lock-toggle {
+    position: absolute; right: 6px; top: 50%; transform: translateY(-50%);
+    width: 32px; height: 32px; border: none; background: transparent;
+    cursor: pointer; color: var(--text3); border-radius: 6px;
+    display: inline-flex; align-items: center; justify-content: center;
+    transition: background 0.12s;
+  }
+  .lock-toggle:hover { background: var(--surface2); color: var(--text); }
+  .lock-toggle svg { width: 16px; height: 16px; stroke: currentColor; stroke-width: 1.7; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+  .lock-error { display: none; font-size: 12.5px; color: var(--danger); margin-top: -2px; }
+  .lock-error.show { display: block; }
+
+  .empty-state { text-align: center; padding: 56px 20px; color: var(--text3); font-size: 14px; }
+  .empty-state svg { width: 42px; height: 42px; margin-bottom: 14px; stroke: var(--border2); stroke-width: 1.4; fill: none; }
+  .loading-state { text-align: center; padding: 48px 20px; color: var(--text3); font-size: 13px; }
+  .spinner { display: inline-block; width: 18px; height: 18px; border: 2px solid var(--border2); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.7s linear infinite; margin-right: 10px; vertical-align: middle; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ---------- Responsive ---------- */
+  @media (max-width: 700px) {
+    .hero h1 { font-size: 30px; }
+    .hero-stats { flex-wrap: wrap; gap: 14px 24px; }
+    .field-row, .field-row-3, .role-bar { grid-template-columns: 1fr; }
+    .stats-grid { grid-template-columns: 1fr 1fr; }
+    .scale-row { grid-template-columns: 1fr 1fr; }
+    .overall-card { grid-template-columns: 1fr; text-align: left; padding: 24px; }
+    .overall-gauge { width: 96px; height: 96px; }
+    .mgr-layout { grid-template-columns: 1fr; }
+    .card { padding: 20px; }
+    .card-head .ic { display: none; }
+    body { padding: 22px 12px 70px; }
+    .resp-meta, .resp-tags { margin-left: 0; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- ---------- HERO ---------- -->
+  <div class="hero">
+    <div class="hero-pill"><span class="dot"></span> Performance review · FY 2025–26</div>
+    <h1>Your <span class="em">honest</span> review,<br/>structured.</h1>
+    <p>Submit your self-assessment or a manager review for the current period. Ratings use a weighted 1–5 scale across ten parameters — with automatic overall calculation and a clear rating band.</p>
+    <div class="hero-stats">
+      <div class="hs"><b>10</b><span>Parameters</span></div>
+      <div class="hs"><b>100%</b><span>Weighted</span></div>
+      <div class="hs"><b>1–5</b><span>Scale</span></div>
+      <div class="hs"><b>2 min</b><span>Self-assessment</span></div>
+    </div>
+  </div>
+
+  <!-- ---------- TAB BAR ---------- -->
+  <div class="tab-bar">
+    <button class="tab active" data-tab="form">
+      <svg viewBox="0 0 24 24"><path d="M12 4v16m-8-8h16"/></svg>
+      Submit review
+    </button>
+    <button class="tab" data-tab="results">
+      <svg viewBox="0 0 24 24"><path d="M3 12h4l3-9 4 18 3-9h4"/></svg>
+      View reviews
+    </button>
+  </div>
+
+  <!-- ---------- FORM PANEL ---------- -->
+  <div id="panel-form" class="panel active">
+
+    <!-- Stepper -->
+    <div class="stepper" id="stepper">
+      <div class="step active" data-step="role"><span class="dot">1</span><span class="lbl">Role</span></div>
+      <span class="sep"></span>
+      <div class="step" data-step="info"><span class="dot">2</span><span class="lbl">Employee info</span></div>
+      <span class="sep"></span>
+      <div class="step" data-step="body"><span class="dot">3</span><span class="lbl" id="step3-lbl">Self-assessment</span></div>
+      <span class="sep"></span>
+      <div class="step" data-step="submit"><span class="dot">4</span><span class="lbl">Submit</span></div>
+    </div>
+
+    <!-- Role -->
+    <div class="card">
+      <div class="card-head">
+        <div class="num">01</div>
+        <div class="tx">
+          <h3>Choose your role</h3>
+          <p>This determines which sections of the form you'll complete.</p>
+        </div>
+        <div class="ic"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg></div>
+      </div>
+      <div class="role-bar">
+        <button type="button" class="role-btn active" data-role="self">
+          <span class="ric"><svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></span>
+          <div class="rc">
+            <div class="rt">The employee</div>
+            <div class="rd">Complete your self-assessment — objectives and general feedback</div>
+          </div>
+        </button>
+        <button type="button" class="role-btn" data-role="manager">
+          <span class="ric"><svg viewBox="0 0 24 24"><path d="M12 2l3 7 7 1-5 5 1 7-6-3-6 3 1-7-5-5 7-1z"/></svg></span>
+          <div class="rc">
+            <div class="rt">The reviewer / manager</div>
+            <div class="rd">Rate the employee against the ten weighted parameters</div>
+          </div>
+        </button>
+      </div>
+    </div>
+
+    <!-- Employee info -->
+    <div class="card">
+      <div class="card-head">
+        <div class="num">02</div>
+        <div class="tx">
+          <h3>Employee information</h3>
+          <p>Who the review is about, and when.</p>
+        </div>
+        <div class="ic"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M16 2v4M8 2v4M4 10h16"/></svg></div>
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label for="fname">Employee name</label>
+          <input type="text" id="fname" placeholder="Jane Smith" autocomplete="name" />
+        </div>
+        <div class="field">
+          <label for="femail">Employee email</label>
+          <div class="email-compound">
+            <input type="text" id="femail" placeholder="jane" autocomplete="username" spellcheck="false" />
+            <span class="email-suffix">@luckmans.com</span>
+          </div>
+        </div>
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label for="fdept">Department</label>
+          <input type="text" id="fdept" placeholder="Audit" />
+        </div>
+        <div class="field">
+          <label for="frole">Role / title</label>
+          <input type="text" id="frole" placeholder="Senior Associate" />
+        </div>
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label for="fperiod">Review period</label>
+          <input type="text" id="fperiod" placeholder="FY 2025-26" value="FY 2025-26" />
+        </div>
+        <div class="field" id="reviewer-field" style="display:none;">
+          <label for="freviewer">Reviewer name</label>
+          <input type="text" id="freviewer" placeholder="John Doe" />
+        </div>
+      </div>
+    </div>
+
+    <!-- Part A + B (self) -->
+    <div class="section self-only" id="self-section">
+      <div class="card">
+        <div class="card-head">
+          <div class="num">03</div>
+          <div class="tx">
+            <h3>Objectives set this period</h3>
+            <p>List each objective and note whether it was achieved. Up to 8 entries.</p>
+          </div>
+          <div class="ic"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></div>
+        </div>
+        <div id="objs-wrap"></div>
+        <button type="button" class="btn-add" id="add-obj">
+          <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg> Add objective
+        </button>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <div class="num">04</div>
+          <div class="tx">
+            <h3>General self-assessment</h3>
+            <p>Honest reflection on progress, team dynamics and career aspirations.</p>
+          </div>
+          <div class="ic"><svg viewBox="0 0 24 24"><path d="M8 12h8M8 8h8M8 16h5M4 6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"/></svg></div>
+        </div>
+        <div class="field">
+          <label for="qProblems">What problems have you encountered meeting your objectives? Have these been solved?</label>
+          <textarea id="qProblems" placeholder="Share specific blockers and how they were (or weren't) resolved"></textarea>
+        </div>
+        <div class="field">
+          <label for="qTraining">Are there any particular areas of training or development you need?</label>
+          <textarea id="qTraining" placeholder="Technical skills, certifications, leadership, etc."></textarea>
+        </div>
+        <div class="field">
+          <label for="qTeamHappy">Are you happy with your team?</label>
+          <textarea id="qTeamHappy" placeholder="Your honest perspective"></textarea>
+        </div>
+        <div class="field">
+          <label for="qConflicts">Do you have any conflicts with team members?</label>
+          <textarea id="qConflicts" placeholder="If yes, what and with whom (confidential)"></textarea>
+        </div>
+        <div class="field">
+          <label for="qRecognition">Does your team accept your ideas and recognise your contribution?</label>
+          <textarea id="qRecognition"></textarea>
+        </div>
+        <div class="field">
+          <label for="qLongTerm">Where do you see yourself in the team long term?</label>
+          <textarea id="qLongTerm" placeholder="1–3 year view"></textarea>
+        </div>
+        <div class="field">
+          <label for="qCareerScope">Do you think you have the scope to realise your career plans here?</label>
+          <textarea id="qCareerScope"></textarea>
+        </div>
+        <div class="field">
+          <label for="qOther">Any other comments</label>
+          <textarea id="qOther" placeholder="Optional"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- Part C (manager) -->
+    <div class="section manager-only" id="manager-section" style="display:none;">
+      <div class="card">
+        <div class="card-head">
+          <div class="num">03</div>
+          <div class="tx">
+            <h3>Parameter ratings</h3>
+            <p>Rate each of the ten parameters on a 1–5 scale. Weights sum to 100%.</p>
+          </div>
+          <div class="ic"><svg viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M7 14l4-4 4 4 5-6"/></svg></div>
+        </div>
+
+        <div class="scale-card">
+          <div class="scale-title">Rating scale</div>
+          <div class="scale-row">
+            <div class="scale-item" data-r="1"><span class="n">1</span>Significantly underperforms</div>
+            <div class="scale-item" data-r="2"><span class="n">2</span>Needs improvement</div>
+            <div class="scale-item" data-r="3"><span class="n">3</span>Meets expectations</div>
+            <div class="scale-item" data-r="4"><span class="n">4</span>Exceeds expectations</div>
+            <div class="scale-item" data-r="5"><span class="n">5</span>Top performer</div>
+          </div>
+        </div>
+
+        <div class="callout-warn">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+          <div>Please provide <strong>specific supporting examples</strong> whenever you rate a 4 or 5.</div>
+        </div>
+
+        <div id="params-wrap"></div>
+      </div>
+
+      <div class="overall-card" id="overall-card">
+        <div class="overall-gauge">
+          <svg viewBox="0 0 120 120">
+            <circle class="bg-ring" cx="60" cy="60" r="52"/>
+            <circle class="fg-ring" id="gauge-fg" cx="60" cy="60" r="52" stroke-dasharray="0 327" pathLength="327"/>
+          </svg>
+          <div class="num" id="overall-num">—</div>
+        </div>
+        <div class="overall-body">
+          <div class="lbl">Weighted overall rating</div>
+          <h2 id="overall-band-title">Awaiting ratings</h2>
+          <div class="overall-band" id="overall-band" style="display:none;"></div>
+          <div class="desc" id="overall-desc">Rate all ten parameters to see the weighted overall rating and descriptor.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="submit-wrap">
+      <button class="btn-primary" id="submit-btn">
+        <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        Submit review
+      </button>
+      <div class="alert alert-success" id="msg-success">
+        <svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>
+        <div>Review submitted successfully. Thank you.</div>
+      </div>
+      <div class="alert alert-error" id="msg-error">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+        <div id="msg-error-text">Something went wrong — please try again.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ---------- RESULTS PANEL ---------- -->
+  <div id="panel-results" class="panel">
+
+    <!-- Lock screen (shown until correct password entered) -->
+    <div class="lock-screen" id="lock-screen">
+      <div class="lock-icon">
+        <svg viewBox="0 0 24 24"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/><circle cx="12" cy="16" r="1.2" fill="currentColor"/></svg>
+      </div>
+      <h3>Protected view</h3>
+      <p>This area contains submitted reviews. Please enter the access password to continue.</p>
+      <form class="lock-form" id="lock-form" autocomplete="off">
+        <div class="lock-input-wrap">
+          <input type="password" id="lock-password" placeholder="Enter password" autocomplete="current-password" />
+          <button type="button" class="lock-toggle" id="lock-toggle" aria-label="Show password">
+            <svg viewBox="0 0 24 24" id="lock-eye"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
+        </div>
+        <div class="lock-error" id="lock-error">Incorrect password. Please try again.</div>
+        <button type="submit" class="btn-primary" style="margin-top: 4px;">
+          <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          Unlock
+        </button>
+      </form>
+    </div>
+
+    <!-- Results content (hidden until unlocked) -->
+    <div id="results-content" style="display:none;">
+      <div class="stats-grid">
+        <div class="stat-card"><div class="stat-val" id="stat-total">—</div><div class="stat-lbl">Total reviews</div></div>
+        <div class="stat-card"><div class="stat-val" id="stat-self">—</div><div class="stat-lbl">Self-assessments</div></div>
+        <div class="stat-card"><div class="stat-val" id="stat-mgr">—</div><div class="stat-lbl">Manager reviews</div></div>
+        <div class="stat-card"><div class="stat-val" id="stat-avg">—</div><div class="stat-lbl">Avg overall rating</div></div>
+      </div>
+      <div class="results-toolbar">
+        <h3>All reviews</h3>
+        <div class="toolbar-right">
+          <input type="text" class="filter-input" id="filter-input" placeholder="Filter by name, email, department…" />
+          <button class="btn-export" id="export-btn">
+            <svg viewBox="0 0 24 24"><path d="M12 3v12m-5-5l5 5 5-5M5 21h14"/></svg>
+            Export CSV
+          </button>
+          <button class="btn-export" id="lock-btn" title="Lock this view">
+            <svg viewBox="0 0 24 24"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+            Lock
+          </button>
+        </div>
+      </div>
+      <div id="results-list">
+        <div class="loading-state"><span class="spinner"></span>Loading reviews…</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  // ============================================================
+  const SCRIPT_URL    = 'PASTE_YOUR_APPS_SCRIPT_WEB_APP_URL_HERE';
+  const VIEW_PASSWORD = 'change-me-now';   // ← change this to your desired password
+  // ============================================================
+
+  const PARAMS = [
+    { key: 'chargeability',  label: 'Chargeability',                 weight: 0.40,  hint: 'Minimum 80% expected for staff/senior. Flag to manager early if trending below 70% or materially over/under-occupied.' },
+    { key: 'accountability', label: 'Accountability',                weight: 0.05,  hint: 'Takes ownership of deliverables and admits mistakes openly.' },
+    { key: 'commitment',     label: 'Commitment',                    weight: 0.05,  hint: 'Takes initiative, solves without being prompted, seeks feedback, adapts to change, long-term mindset.' },
+    { key: 'business_dev',   label: 'Business & process development',weight: 0.05,  hint: 'Contributes ideas in techstorming, identifies opportunities to improve processes and support business growth.' },
+    { key: 'quality',        label: 'Quality',                       weight: 0.10,  hint: 'Delivers reliable, standards-compliant work so reviewers can focus on critical areas instead of corrections.' },
+    { key: 'timeliness',     label: 'Timeliness & punctuality',      weight: 0.075, hint: 'Hits assigned deadlines, plans leaves in advance, updates timesheets on time.' },
+    { key: 'communication',  label: 'Communication',                 weight: 0.10,  hint: 'Proactive updates, flags issues early, respectful with seniors and juniors, timely with the UK team.' },
+    { key: 'participation',  label: 'Participation',                 weight: 0.05,  hint: 'Willing participation in team events, trainings and firm initiatives.' },
+    { key: 'ethics',         label: 'Work ethics & discipline',      weight: 0.075, hint: 'Professionalism, honest timesheets, outcomes over hours, respects the system and clients.' },
+    { key: 'team_player',    label: 'Team player',                   weight: 0.05,  hint: 'Collaborates effectively, positive attitude, supports colleagues and contributes to collective goals.' }
+  ];
+
+  const RATING_DESC = {
+    1: { label: 'Significantly underperforms', note: 'Has significantly underperformed — a performance improvement plan should be implemented as soon as possible.' },
+    2: { label: 'Needs improvement',           note: 'Has performed below average — focus should be placed on identifying measures to improve performance.' },
+    3: { label: 'Meets expectations',          note: 'Has performed on par with colleagues and expectations for the role / position.' },
+    4: { label: 'Exceeds expectations',        note: 'Has performed above average and stretched themself to achieve positive feedback and outcomes.' },
+    5: { label: 'Top performer',               note: 'Has significantly exceeded expectations and is performing well above their current position.' }
+  };
+
+  let currentRole = 'self';
+  let objCount = 0;
+  let ratings = {};
+  let cachedSelf = [], cachedMgr = [];
+  let resultsUnlocked = false;
+
+  async function callScript(opts) {
+    if (!SCRIPT_URL || SCRIPT_URL.indexOf('script.google.com') === -1) {
+      throw new Error('SCRIPT_URL is not set. Paste your Apps Script web-app URL into the SCRIPT_URL constant at the top of <script>.');
+    }
+    const res  = await fetch(SCRIPT_URL, opts || {});
+    const text = await res.text();
+    const t = text.trim();
+    if (t.charAt(0) !== '{' && t.charAt(0) !== '[') {
+      throw new Error(
+        'Apps Script returned HTML instead of JSON. Common causes: (1) the deployment access is not set to "Anyone", ' +
+        '(2) you edited Code.gs but didn\'t create a NEW deployment (Deploy → New deployment), ' +
+        '(3) the SCRIPT_URL points at an old or unpublished deployment.'
+      );
+    }
+    return JSON.parse(text);
+  }
+
+  // --- Setup ---
+  document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', () => switchTab(t.dataset.tab, t)));
+  document.querySelectorAll('.role-btn').forEach(b => b.addEventListener('click', () => setRole(b.dataset.role)));
+  document.getElementById('add-obj').addEventListener('click', () => addObjective());
+  document.getElementById('submit-btn').addEventListener('click', submitForm);
+  document.getElementById('export-btn').addEventListener('click', exportCSV);
+  document.getElementById('filter-input').addEventListener('input', renderResults);
+  document.getElementById('lock-btn').addEventListener('click', lockResults);
+  document.getElementById('lock-form').addEventListener('submit', tryUnlock);
+  document.getElementById('lock-toggle').addEventListener('click', togglePasswordVisibility);
+
+  ['fname','femail','fdept','frole','fperiod','freviewer'].forEach(id => {
+    document.getElementById(id).addEventListener('input', updateStepper);
+  });
+
+  addObjective();
+  renderParams();
+  updateOverall();
+  updateStepper();
+
+  function setRole(role) {
+    currentRole = role;
+    document.querySelectorAll('.role-btn').forEach(b => b.classList.toggle('active', b.dataset.role === role));
+    document.getElementById('self-section').style.display    = role === 'self'    ? 'block' : 'none';
+    document.getElementById('manager-section').style.display = role === 'manager' ? 'block' : 'none';
+    document.getElementById('reviewer-field').style.display  = role === 'manager' ? 'block' : 'none';
+    document.getElementById('step3-lbl').textContent = role === 'self' ? 'Self-assessment' : 'Manager rating';
+    updateStepper();
+  }
+
+  function switchTab(tab, btn) {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('panel-' + tab).classList.add('active');
+    if (tab === 'results') {
+      if (resultsUnlocked) loadResults();
+      else showLockScreen();
+    }
+  }
+
+  // --- Password lock ---
+  function showLockScreen() {
+    document.getElementById('lock-screen').style.display   = 'block';
+    document.getElementById('results-content').style.display = 'none';
+    const pw = document.getElementById('lock-password');
+    pw.value = '';
+    document.getElementById('lock-error').classList.remove('show');
+    setTimeout(() => pw.focus(), 80);
+  }
+
+  function tryUnlock(ev) {
+    ev.preventDefault();
+    const entered = document.getElementById('lock-password').value;
+    const err     = document.getElementById('lock-error');
+    if (entered === VIEW_PASSWORD) {
+      resultsUnlocked = true;
+      err.classList.remove('show');
+      document.getElementById('lock-screen').style.display   = 'none';
+      document.getElementById('results-content').style.display = 'block';
+      loadResults();
+    } else {
+      err.classList.add('show');
+      const pw = document.getElementById('lock-password');
+      pw.value = '';
+      pw.focus();
+    }
+  }
+
+  function lockResults() {
+    resultsUnlocked = false;
+    cachedSelf = [];
+    cachedMgr  = [];
+    showLockScreen();
+  }
+
+  function togglePasswordVisibility() {
+    const pw  = document.getElementById('lock-password');
+    const eye = document.getElementById('lock-eye');
+    if (pw.type === 'password') {
+      pw.type = 'text';
+      eye.innerHTML = '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24M1 1l22 22"/>';
+    } else {
+      pw.type = 'password';
+      eye.innerHTML = '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z"/><circle cx="12" cy="12" r="3"/>';
+    }
+  }
+
+  // --- Stepper ---
+  function updateStepper() {
+    const infoDone = ['fname','femail','fdept','frole','fperiod'].every(id => document.getElementById(id).value.trim()) &&
+                     (currentRole === 'self' || document.getElementById('freviewer').value.trim());
+    let bodyDone = false;
+    if (currentRole === 'self') {
+      const anyObj = Array.from(document.querySelectorAll('.obj-text')).some(t => t.value.trim());
+      bodyDone = anyObj;
+    } else {
+      bodyDone = Object.keys(ratings).length === PARAMS.length;
+    }
+    const steps = document.querySelectorAll('.step');
+    const states = [true, infoDone, bodyDone, infoDone && bodyDone];
+    steps.forEach((s, i) => {
+      s.classList.toggle('done', states[i] && !(i === 3));
+      s.classList.toggle('active', (i === 0) || (i === 1 && !states[1]) || (i === 2 && states[1] && !states[2]) || (i === 3 && states[2]));
+    });
+  }
+
+  // --- Objectives ---
+  function addObjective() {
+    if (objCount >= 8) return;
+    objCount++;
+    const n = objCount;
+    const block = document.createElement('div');
+    block.className = 'obj-block';
+    block.dataset.obj = n;
+    block.innerHTML = `
+      <div class="obj-head">
+        <div class="obj-num"><span class="chip">${n}</span> Objective</div>
+        <button type="button" class="obj-remove" data-remove="${n}">
+          <svg viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg> Remove
+        </button>
+      </div>
+      <div class="field">
+        <label>Objective</label>
+        <textarea class="obj-text" placeholder="Describe the objective set for this period"></textarea>
+      </div>
+      <div class="field-row">
+        <div class="field" style="margin:0;">
+          <label>Status</label>
+          <select class="obj-status">
+            <option value="">— select —</option>
+            <option value="Achieved">Achieved</option>
+            <option value="Partially Achieved">Partially achieved</option>
+            <option value="Not Achieved">Not achieved</option>
+          </select>
+        </div>
+        <div class="field" style="margin:0;">
+          <label>Comment</label>
+          <input type="text" class="obj-comment" placeholder="Brief supporting note" />
+        </div>
+      </div>`;
+    document.getElementById('objs-wrap').appendChild(block);
+    block.querySelector('.obj-remove').addEventListener('click', () => { block.remove(); renumberObjectives(); });
+    block.querySelectorAll('.obj-text, .obj-status, .obj-comment').forEach(el => el.addEventListener('input', updateStepper));
+    updateAddBtn();
+    updateStepper();
+  }
+  function renumberObjectives() {
+    const blocks = document.querySelectorAll('#objs-wrap .obj-block');
+    objCount = blocks.length;
+    blocks.forEach((b, i) => { b.querySelector('.obj-num .chip').textContent = i + 1; b.dataset.obj = i + 1; });
+    updateAddBtn();
+    updateStepper();
+  }
+  function updateAddBtn() {
+    const b = document.getElementById('add-obj');
+    b.disabled = objCount >= 8;
+    b.style.opacity = objCount >= 8 ? '0.5' : '1';
+  }
+
+  // --- Params ---
+  function renderParams() {
+    const wrap = document.getElementById('params-wrap');
+    wrap.innerHTML = PARAMS.map((p, i) => `
+      <div class="param-row" data-key="${p.key}">
+        <div class="param-head">
+          <div>
+            <div class="param-name"><span class="pnum">${String(i+1).padStart(2,'0')}</span>${p.label}</div>
+            <div class="param-hint">${p.hint}</div>
+          </div>
+          <div class="param-weight${p.weight >= 0.1 ? ' big' : ''}">${(p.weight * 100).toFixed(p.weight < 0.1 ? 1 : 0)}% weight</div>
+        </div>
+        <div class="rating-seg">
+          ${[1,2,3,4,5].map(v => `<button type="button" class="rating-btn" data-val="${v}" data-key="${p.key}">${v}</button>`).join('')}
+        </div>
+        <div class="just-box">
+          <textarea class="just-text" data-key="${p.key}" placeholder="Justification — required for ratings of 4 or 5"></textarea>
+          <div class="just-req" data-req="${p.key}">A specific supporting example is required for ratings of 4 or 5.</div>
+        </div>
+      </div>`).join('');
+    wrap.querySelectorAll('.rating-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const key = btn.dataset.key, val = Number(btn.dataset.val);
+        ratings[key] = val;
+        wrap.querySelectorAll(`.rating-btn[data-key="${key}"]`).forEach(b => b.classList.toggle('active', Number(b.dataset.val) === val));
+        updateOverall();
+        validateJustification(key);
+        updateStepper();
+      });
+    });
+    wrap.querySelectorAll('.just-text').forEach(t => t.addEventListener('input', () => validateJustification(t.dataset.key)));
+  }
+  function validateJustification(key) {
+    const score = ratings[key];
+    const text  = document.querySelector(`.just-text[data-key="${key}"]`).value.trim();
+    const req   = document.querySelector(`.just-req[data-req="${key}"]`);
+    req.classList.toggle('show', (score === 4 || score === 5) && text.length < 10);
+  }
+
+  // --- Overall gauge ---
+  function updateOverall() {
+    let sum = 0, filled = 0;
+    PARAMS.forEach(p => { if (ratings[p.key]) { sum += ratings[p.key] * p.weight; filled++; } });
+    const num  = document.getElementById('overall-num');
+    const title= document.getElementById('overall-band-title');
+    const band = document.getElementById('overall-band');
+    const desc = document.getElementById('overall-desc');
+    const fg   = document.getElementById('gauge-fg');
+    const CIRC = 2 * Math.PI * 52;
+    if (filled === 0) {
+      num.textContent = '—';
+      title.textContent = 'Awaiting ratings';
+      band.style.display = 'none';
+      desc.textContent = 'Rate all ten parameters to see the weighted overall rating and descriptor.';
+      fg.setAttribute('stroke-dasharray', `0 ${CIRC}`);
+      return;
+    }
+    const rounded = Math.round(sum * 100) / 100;
+    num.textContent = rounded.toFixed(2);
+    const prog = (sum / 5) * CIRC;
+    fg.setAttribute('stroke-dasharray', `${prog} ${CIRC - prog}`);
+    if (filled < PARAMS.length) {
+      title.textContent = 'In progress';
+      band.style.display = 'inline-flex';
+      band.textContent = filled + ' of ' + PARAMS.length + ' parameters rated';
+      desc.textContent = 'Current running weighted total. Keep going to complete the review.';
+    } else {
+      const key = Math.max(1, Math.min(5, Math.round(sum)));
+      const b = RATING_DESC[key];
+      title.textContent = b.label;
+      band.style.display = 'inline-flex';
+      band.textContent = 'Band ' + key + ' / 5';
+      desc.textContent = b.note;
+    }
+  }
+
+  // --- Submit ---
+  async function submitForm() {
+    const successEl = document.getElementById('msg-success');
+    const errorEl   = document.getElementById('msg-error');
+    const errorTx   = document.getElementById('msg-error-text');
+    successEl.classList.remove('show');
+    errorEl.classList.remove('show');
+
+    const name     = document.getElementById('fname').value.trim();
+    const username = document.getElementById('femail').value.trim().toLowerCase();
+    const dept     = document.getElementById('fdept').value.trim();
+    const role     = document.getElementById('frole').value.trim();
+    const period   = document.getElementById('fperiod').value.trim();
+
+    if (!name)                              return alert('Please enter the employee name.');
+    if (!username)                          return alert('Please enter your email username.');
+    if (username.includes(' '))             return alert('Email cannot contain spaces.');
+    if (!/^[a-z0-9._]+$/.test(username))    return alert('Only letters, numbers, dot and underscore allowed in email.');
+    const email = username.replace(/\.+$/, '') + '@luckmans.com';
+    if (!period)                            return alert('Please enter a review period.');
+
+    let payload;
+    if (currentRole === 'self') {
+      const objectives = [];
+      document.querySelectorAll('#objs-wrap .obj-block').forEach(b => {
+        const text = b.querySelector('.obj-text').value.trim();
+        if (!text) return;
+        objectives.push({
+          text,
+          status:  b.querySelector('.obj-status').value,
+          comment: b.querySelector('.obj-comment').value.trim()
+        });
+      });
+      if (objectives.length === 0) return alert('Please add at least one objective with a description.');
+      payload = {
+        kind: 'self',
+        name, email, department: dept, role, period,
+        objectives,
+        problems:        document.getElementById('qProblems').value.trim(),
+        training:        document.getElementById('qTraining').value.trim(),
+        teamHappy:       document.getElementById('qTeamHappy').value.trim(),
+        teamConflicts:   document.getElementById('qConflicts').value.trim(),
+        teamRecognition: document.getElementById('qRecognition').value.trim(),
+        longTerm:        document.getElementById('qLongTerm').value.trim(),
+        careerScope:     document.getElementById('qCareerScope').value.trim(),
+        otherComments:   document.getElementById('qOther').value.trim()
+      };
+    } else {
+      const reviewer = document.getElementById('freviewer').value.trim();
+      if (!reviewer) return alert('Please enter your name as reviewer.');
+      const missing = PARAMS.filter(p => !ratings[p.key]).map(p => p.label);
+      if (missing.length) return alert('Please rate all parameters. Missing: ' + missing.join(', '));
+      const ratingsOut = {};
+      let needExample = [];
+      PARAMS.forEach(p => {
+        const score = ratings[p.key];
+        const just  = document.querySelector(`.just-text[data-key="${p.key}"]`).value.trim();
+        if ((score === 4 || score === 5) && just.length < 10) needExample.push(p.label);
+        ratingsOut[p.key] = { score, justification: just };
+      });
+      if (needExample.length) return alert('Please add supporting examples (≥10 chars) for 4/5 ratings: ' + needExample.join(', '));
+      payload = { kind: 'manager', reviewer, name, email, department: dept, role, period, ratings: ratingsOut };
+    }
+
+    const btn = document.getElementById('submit-btn');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner" style="margin-right:0;"></span> Submitting…';
+    try {
+      const json = await callScript({ method: 'POST', body: JSON.stringify(payload) });
+      if (!json.success) throw new Error(json.error || 'Script returned failure');
+      successEl.classList.add('show');
+      btn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg> Submitted';
+      resetForm();
+      setTimeout(() => {
+        btn.disabled = false;
+        btn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg> Submit review';
+        successEl.classList.remove('show');
+      }, 3500);
+    } catch (err) {
+      console.error(err);
+      errorTx.textContent = err.message || 'Something went wrong — please try again.';
+      errorEl.classList.add('show');
+      btn.disabled = false;
+      btn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg> Submit review';
+    }
+  }
+
+  function resetForm() {
+    ['fname','femail','fdept','frole','freviewer','qProblems','qTraining','qTeamHappy','qConflicts','qRecognition','qLongTerm','qCareerScope','qOther']
+      .forEach(id => { document.getElementById(id).value = ''; });
+    document.getElementById('objs-wrap').innerHTML = '';
+    objCount = 0;
+    addObjective();
+    ratings = {};
+    renderParams();
+    updateOverall();
+    updateStepper();
+  }
+
+  // --- Results ---
+  async function loadResults() {
+    const list = document.getElementById('results-list');
+    list.innerHTML = '<div class="loading-state"><span class="spinner"></span>Loading reviews…</div>';
+    try {
+      const json = await callScript();
+      if (!json.success) throw new Error(json.error);
+      cachedSelf = json.self || [];
+      cachedMgr  = json.manager || [];
+      renderStats();
+      renderResults();
+    } catch (err) {
+      console.error(err);
+      list.innerHTML = '<div class="empty-state"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg><br>Could not load reviews.<br><span style="font-size:12px;">' + esc(err.message) + '</span></div>';
+    }
+  }
+
+  function renderStats() {
+    const total = cachedSelf.length + cachedMgr.length;
+    const avg   = cachedMgr.length ? (cachedMgr.reduce((s, r) => s + (r.overall || 0), 0) / cachedMgr.length) : 0;
+    document.getElementById('stat-total').textContent = total;
+    document.getElementById('stat-self').textContent  = cachedSelf.length;
+    document.getElementById('stat-mgr').textContent   = cachedMgr.length;
+    document.getElementById('stat-avg').textContent   = cachedMgr.length ? avg.toFixed(2) : '—';
+  }
+
+  function initials(name) {
+    return String(name || '').trim().split(/\s+/).map(s => s.charAt(0)).slice(0,2).join('').toUpperCase() || '—';
+  }
+
+  function renderResults() {
+    const q = document.getElementById('filter-input').value.trim().toLowerCase();
+    const match = r => !q || [r.name, r.email, r.department, r.role, r.period].some(v => String(v || '').toLowerCase().includes(q));
+    const selves = cachedSelf.filter(match).map(r => ({ ...r, _type: 'self' }));
+    const mgrs   = cachedMgr.filter(match).map(r => ({ ...r, _type: 'manager' }));
+    const all    = selves.concat(mgrs).sort((a, b) => (b.ts || '').localeCompare(a.ts || ''));
+
+    const list = document.getElementById('results-list');
+    if (all.length === 0) {
+      list.innerHTML = '<div class="empty-state"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><br>No reviews yet.</div>';
+      return;
+    }
+    list.innerHTML = all.map(r => r._type === 'self' ? renderSelfCard(r) : renderMgrCard(r)).join('');
+  }
+
+  function renderSelfCard(r) {
+    const objs = (r.objectives && r.objectives.length) ? `
+      <div class="resp-section">
+        <h4>Objectives</h4>
+        <table class="obj-tbl">
+          <thead><tr><th style="width:30px;">#</th><th>Objective</th><th style="width:150px;">Status</th><th>Comment</th></tr></thead>
+          <tbody>${r.objectives.map((o, i) => `<tr>
+            <td style="color:var(--text3);font-family:'DM Mono',monospace;font-size:11px;">${i+1}</td>
+            <td>${esc(o.text)}</td>
+            <td>${o.status ? `<span class="status-pill" data-s="${esc(o.status)}">${esc(o.status)}</span>` : ''}</td>
+            <td style="color:var(--text2);">${esc(o.comment)}</td>
+          </tr>`).join('')}</tbody>
+        </table>
+      </div>` : '';
+    const qa = [
+      ['Problems encountered',    r.problems],
+      ['Training needs',          r.training],
+      ['Team happiness',          r.teamHappy],
+      ['Team conflicts',          r.teamConflicts],
+      ['Team recognition',        r.teamRecognition],
+      ['Long-term vision',        r.longTerm],
+      ['Career scope',            r.careerScope],
+      ['Other comments',          r.otherComments]
+    ].filter(([, v]) => v && v.trim());
+    const qaHtml = qa.length ? `
+      <div class="resp-section">
+        <h4>General self-assessment</h4>
+        <div class="qa-list">${qa.map(([q, v]) => `<div class="qa-item"><div class="q">${esc(q)}</div><div class="a">${esc(v)}</div></div>`).join('')}</div>
+      </div>` : '';
+    return `<div class="resp-card">
+      <div class="resp-top">
+        <div class="resp-id">
+          <div class="avatar">${esc(initials(r.name))}</div>
+          <div><div class="resp-name">${esc(r.name)}</div><div class="resp-tags" style="margin-top:2px;margin-left:0;"><span class="badge badge-self">Self-assessment</span></div></div>
+        </div>
+        <span class="resp-time">${esc(r.ts)}</span>
+      </div>
+      <div class="resp-meta"><span>·</span>${esc(r.email)}<span>·</span>${esc(r.department)}<span>·</span>${esc(r.role)}<span>·</span>${esc(r.period)}</div>
+      ${objs}${qaHtml}
+    </div>`;
+  }
+
+  function renderMgrCard(r) {
+    const rows = PARAMS.map((p, i) => {
+      const rr = (r.ratings && r.ratings[p.key]) || { score: 0, justification: '' };
+      return `<tr>
+        <td style="color:var(--text3);font-family:'DM Mono',monospace;font-size:11px;width:30px;">${String(i+1).padStart(2,'0')}</td>
+        <td>${esc(p.label)}</td>
+        <td style="text-align:center;width:56px;"><span class="status-pill" style="background:var(--r${Math.max(1,Math.min(5,rr.score||3))}-bg);color:var(--r${Math.max(1,Math.min(5,rr.score||3))});font-family:'DM Mono',monospace;font-weight:600;">${rr.score || '—'}</span></td>
+        <td style="font-family:'DM Mono',monospace;color:var(--text3);width:56px;">${(p.weight*100).toFixed(p.weight<0.1?1:0)}%</td>
+        <td style="color:var(--text2);">${esc(rr.justification)}</td>
+      </tr>`;
+    }).join('');
+    const band = RATING_DESC[Math.max(1, Math.min(5, Math.round(r.overall)))] || RATING_DESC[3];
+    const radar = renderRadar(r);
+    return `<div class="resp-card">
+      <div class="resp-top">
+        <div class="resp-id">
+          <div class="avatar mgr">${esc(initials(r.name))}</div>
+          <div>
+            <div class="resp-name">${esc(r.name)}</div>
+            <div class="resp-tags" style="margin-top:2px;margin-left:0;">
+              <span class="badge badge-mgr">Manager review</span>
+              <span class="badge badge-rating">Overall ${Number(r.overall).toFixed(2)} · ${esc(band.label)}</span>
+            </div>
+          </div>
+        </div>
+        <span class="resp-time">${esc(r.ts)}</span>
+      </div>
+      <div class="resp-meta"><span>·</span>${esc(r.email)}<span>·</span>${esc(r.department)}<span>·</span>${esc(r.role)}<span>·</span>${esc(r.period)}<span>·</span>reviewed by ${esc(r.reviewer)}</div>
+      <div class="resp-section">
+        <h4>Parameter ratings</h4>
+        <div class="mgr-layout">
+          <table class="rating-tbl">
+            <thead><tr><th>#</th><th>Parameter</th><th style="text-align:center;">Score</th><th>Weight</th><th>Justification</th></tr></thead>
+            <tbody>${rows}</tbody>
+          </table>
+          ${radar}
+        </div>
+      </div>
+    </div>`;
+  }
+
+  // SVG radar — 10-axis, max 5
+  function renderRadar(r) {
+    const cx = 85, cy = 85, R = 60, N = PARAMS.length;
+    const pts = PARAMS.map((p, i) => {
+      const angle = (Math.PI * 2 * i) / N - Math.PI / 2;
+      const score = (r.ratings && r.ratings[p.key] && r.ratings[p.key].score) || 0;
+      const rr = (score / 5) * R;
+      return [cx + Math.cos(angle) * rr, cy + Math.sin(angle) * rr];
+    });
+    const polygon = pts.map(p => p.join(',')).join(' ');
+    const rings = [1, 2, 3, 4, 5].map(k => {
+      const ringPts = PARAMS.map((_, i) => {
+        const angle = (Math.PI * 2 * i) / N - Math.PI / 2;
+        const rr = (k / 5) * R;
+        return [cx + Math.cos(angle) * rr, cy + Math.sin(angle) * rr].join(',');
+      }).join(' ');
+      return `<polygon points="${ringPts}" fill="none" stroke="rgba(30,74,55,0.08)" stroke-width="1"/>`;
+    }).join('');
+    const spokes = PARAMS.map((_, i) => {
+      const angle = (Math.PI * 2 * i) / N - Math.PI / 2;
+      const x = cx + Math.cos(angle) * R, y = cy + Math.sin(angle) * R;
+      return `<line x1="${cx}" y1="${cy}" x2="${x}" y2="${y}" stroke="rgba(30,74,55,0.08)" stroke-width="1"/>`;
+    }).join('');
+    const dots = pts.map(p => `<circle cx="${p[0]}" cy="${p[1]}" r="2.5" fill="#1E4A37"/>`).join('');
+    return `<div class="radar-wrap">
+      <svg viewBox="0 0 170 170">
+        ${rings}${spokes}
+        <polygon points="${polygon}" fill="rgba(30,74,55,0.18)" stroke="#1E4A37" stroke-width="1.5"/>
+        ${dots}
+      </svg>
+      <div class="cap">Profile</div>
+    </div>`;
+  }
+
+  function esc(s) {
+    return String(s == null ? '' : s)
+      .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+      .replace(/"/g,'&quot;').replace(/\n/g,'<br>');
+  }
+
+  function exportCSV() {
+    if (!cachedSelf.length && !cachedMgr.length) { alert('No reviews to export yet.'); return; }
+    const rows = [];
+    rows.push(['Type','Submitted','Employee','Email','Department','Role','Period','Reviewer','Obj#','Objective','Status','Obj Comment',
+               ...PARAMS.flatMap(p => [p.label+' Score', p.label+' Justification']),
+               'Overall Rating',
+               'Problems','Training','Team Happiness','Conflicts','Recognition','Long Term','Career Scope','Other']);
+    cachedSelf.forEach(r => {
+      const base = ['self', r.ts, r.name, r.email, r.department, r.role, r.period, ''];
+      const tail = [...PARAMS.flatMap(() => ['','']), '', r.problems, r.training, r.teamHappy, r.teamConflicts, r.teamRecognition, r.longTerm, r.careerScope, r.otherComments];
+      if (!r.objectives || !r.objectives.length) {
+        rows.push([...base, '', '', '', '', ...tail]);
+      } else {
+        r.objectives.forEach((o, i) => {
+          rows.push([...base, i+1, o.text, o.status, o.comment, ...(i === 0 ? tail : [...PARAMS.flatMap(() => ['','']), '', '','','','','','','',''])]);
+        });
+      }
+    });
+    cachedMgr.forEach(r => {
+      const scores = PARAMS.flatMap(p => {
+        const rr = (r.ratings && r.ratings[p.key]) || { score: '', justification: '' };
+        return [rr.score, rr.justification];
+      });
+      rows.push(['manager', r.ts, r.name, r.email, r.department, r.role, r.period, r.reviewer,
+                '', '', '', '', ...scores, r.overall, '', '', '', '', '', '', '', '']);
+    });
+    const csv = rows.map(row => row.map(c => `"${String(c == null ? '' : c).replace(/"/g,'""')}"`).join(',')).join('\r\n');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'performance_reviews.csv';
+    a.click();
+  }
+</script>
+</body>
+</html>
