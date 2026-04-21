@@ -224,26 +224,210 @@
   /* ---------- Role selector ---------- */
   .role-bar { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
   .role-btn {
-    padding: 18px 20px; border: 1px solid var(--border2);
-    background: var(--surface); border-radius: var(--radius-md);
+    padding: 18px 20px; border: 1.5px solid transparent;
+    border-radius: var(--radius-md);
     cursor: pointer; font-family: inherit; text-align: left;
     transition: all 0.2s var(--ease);
     display: flex; gap: 14px; align-items: flex-start;
   }
-  .role-btn:hover { border-color: var(--border-strong); transform: translateY(-1px); box-shadow: var(--shadow-sm); }
-  .role-btn.active { border-color: var(--accent); background: var(--accent-soft); box-shadow: var(--ring); }
+  .role-btn[data-role="self"]    { background: var(--r3-bg); border-color: rgba(39,75,109,0.18); }
+  .role-btn[data-role="manager"] { background: var(--r4-bg); border-color: rgba(46,99,72,0.18); }
+  .role-btn:hover { transform: translateY(-1px); box-shadow: var(--shadow-sm); }
+  .role-btn[data-role="self"]:hover    { border-color: rgba(39,75,109,0.45); }
+  .role-btn[data-role="manager"]:hover { border-color: rgba(46,99,72,0.45); }
+  .role-btn[data-role="self"].active {
+    border-color: var(--r3);
+    box-shadow: 0 0 0 3px rgba(39,75,109,0.15), var(--shadow-sm);
+  }
+  .role-btn[data-role="manager"].active {
+    border-color: var(--r4);
+    box-shadow: 0 0 0 3px rgba(46,99,72,0.18), var(--shadow-sm);
+  }
   .role-btn .ric {
     width: 40px; height: 40px; border-radius: 10px; flex-shrink: 0;
-    background: var(--surface2); border: 1px solid var(--border);
+    background: rgba(255,255,255,0.7);
     display: inline-flex; align-items: center; justify-content: center;
-    color: var(--text2); transition: all 0.2s var(--ease);
+    transition: all 0.2s var(--ease);
   }
+  .role-btn[data-role="self"] .ric    { color: var(--r3); border: 1px solid rgba(39,75,109,0.22); }
+  .role-btn[data-role="manager"] .ric { color: var(--r4); border: 1px solid rgba(46,99,72,0.22); }
   .role-btn .ric svg { width: 20px; height: 20px; stroke: currentColor; stroke-width: 1.6; fill: none; stroke-linecap: round; stroke-linejoin: round; }
-  .role-btn.active .ric { background: var(--accent); border-color: var(--accent); color: var(--text-inv); }
+  .role-btn[data-role="self"].active    .ric { background: var(--r3); border-color: var(--r3); color: #fff; }
+  .role-btn[data-role="manager"].active .ric { background: var(--r4); border-color: var(--r4); color: #fff; }
   .role-btn .rc { flex: 1; }
   .role-btn .rt { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 3px; }
   .role-btn .rd { font-size: 12px; color: var(--text2); line-height: 1.5; }
-  .role-btn.active .rt { color: var(--accent-text); }
+  .role-btn[data-role="self"].active    .rt { color: var(--r3); }
+  .role-btn[data-role="manager"].active .rt { color: var(--r4); }
+
+  /* ---------- Guidance link ---------- */
+  .guidance-link {
+    display: inline-flex; align-items: center; gap: 8px;
+    margin-top: 14px; padding: 9px 14px;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 999px; color: var(--accent-text);
+    font-size: 13px; font-weight: 500; text-decoration: none;
+    box-shadow: var(--shadow-xs);
+    transition: all 0.2s var(--ease); cursor: pointer;
+  }
+  .guidance-link:hover {
+    border-color: var(--accent); background: var(--accent-soft);
+    transform: translateY(-1px); box-shadow: var(--shadow-sm);
+  }
+  .guidance-link .arr { transition: transform 0.2s var(--ease); }
+  .guidance-link:hover .arr { transform: translateX(3px); }
+  .guidance-link svg { width: 14px; height: 14px; stroke: currentColor; stroke-width: 1.7; fill: none; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0; }
+  body.panel-open .guidance-link { background: var(--accent-soft); border-color: var(--accent); }
+
+  /* ---------- Parameter chart panel ---------- */
+  .main-area { transition: padding-right 0.3s var(--ease); }
+  .panel-backdrop {
+    position: fixed; inset: 0; background: rgba(20,19,16,0.35);
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.25s var(--ease); z-index: 40;
+    backdrop-filter: blur(2px); -webkit-backdrop-filter: blur(2px);
+  }
+  .chart-panel {
+    position: fixed; top: 0; right: 0; bottom: 0;
+    width: 420px; max-width: 100vw;
+    background: var(--surface); border-left: 1px solid var(--border);
+    box-shadow: -12px 0 32px rgba(0,0,0,0.08);
+    transform: translateX(100%);
+    transition: transform 0.32s var(--ease);
+    z-index: 50;
+    display: flex; flex-direction: column;
+  }
+  body.panel-open .chart-panel { transform: translateX(0); }
+  .panel-head {
+    padding: 18px 22px; border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; gap: 12px;
+    background: var(--surface-warm);
+  }
+  .panel-head .ph-ic {
+    width: 32px; height: 32px; border-radius: 8px;
+    background: var(--accent-soft); border: 1px solid var(--accent-border);
+    display: inline-flex; align-items: center; justify-content: center;
+    color: var(--accent); flex-shrink: 0;
+  }
+  .panel-head .ph-ic svg { width: 16px; height: 16px; stroke: currentColor; stroke-width: 1.7; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+  .panel-head h3 {
+    flex: 1; font-family: 'Fraunces', serif; font-weight: 500;
+    font-size: 18px; letter-spacing: -0.3px; color: var(--text);
+  }
+  .panel-head .ph-sub {
+    font-size: 11px; color: var(--text3); letter-spacing: 0.03em;
+    text-transform: uppercase; margin-top: 1px;
+  }
+  .panel-close {
+    width: 32px; height: 32px; border: 1px solid var(--border2);
+    background: var(--surface); border-radius: 8px; cursor: pointer;
+    display: inline-flex; align-items: center; justify-content: center;
+    color: var(--text2); transition: all 0.12s;
+  }
+  .panel-close:hover { background: var(--surface2); color: var(--text); border-color: var(--border-strong); }
+  .panel-close svg { width: 14px; height: 14px; stroke: currentColor; stroke-width: 2; fill: none; stroke-linecap: round; }
+
+  .panel-body { flex: 1; overflow-y: auto; padding: 18px 20px 30px; }
+  .panel-body::-webkit-scrollbar { width: 8px; }
+  .panel-body::-webkit-scrollbar-track { background: transparent; }
+  .panel-body::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 4px; }
+  .panel-body::-webkit-scrollbar-thumb:hover { background: var(--border-strong); }
+
+  .panel-scale {
+    background: var(--surface-warm); border: 1px solid var(--border);
+    border-radius: var(--radius-md); padding: 14px; margin-bottom: 18px;
+  }
+  .panel-scale .st { font-size: 10.5px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text3); margin-bottom: 10px; }
+  .panel-scale .sr { display: flex; gap: 8px; padding: 8px 10px; border-radius: var(--radius-sm); margin-bottom: 6px; align-items: flex-start; font-size: 12px; line-height: 1.45; }
+  .panel-scale .sr:last-child { margin-bottom: 0; }
+  .panel-scale .sr .sn { font-family: 'DM Mono', monospace; font-weight: 600; font-size: 14px; flex-shrink: 0; }
+  .panel-scale .sr .sl { font-weight: 600; }
+  .panel-scale .sr[data-r="1"] { background: var(--r1-bg); color: var(--r1); }
+  .panel-scale .sr[data-r="2"] { background: var(--r2-bg); color: var(--r2); }
+  .panel-scale .sr[data-r="3"] { background: var(--r3-bg); color: var(--r3); }
+  .panel-scale .sr[data-r="4"] { background: var(--r4-bg); color: var(--r4); }
+  .panel-scale .sr[data-r="5"] { background: var(--r5-bg); color: var(--r5); }
+
+  .panel-note {
+    display: flex; gap: 10px; align-items: flex-start;
+    background: var(--warn-light); border: 1px solid var(--warn-border);
+    border-radius: var(--radius-sm); padding: 10px 12px;
+    color: var(--warn); font-size: 12px; line-height: 1.5; margin-bottom: 18px;
+  }
+  .panel-note svg { width: 14px; height: 14px; stroke: currentColor; stroke-width: 1.8; fill: none; flex-shrink: 0; margin-top: 2px; }
+
+  .panel-section-title {
+    font-size: 10.5px; font-weight: 600; letter-spacing: 0.08em;
+    text-transform: uppercase; color: var(--text3); margin-bottom: 10px;
+  }
+
+  details.param-acc {
+    border: 1px solid var(--border); border-radius: var(--radius-sm);
+    margin-bottom: 8px; background: var(--surface); overflow: hidden;
+    transition: border-color 0.15s;
+  }
+  details.param-acc:hover { border-color: var(--border-strong); }
+  details.param-acc[open] { border-color: var(--accent-border); background: var(--surface); }
+  details.param-acc summary {
+    list-style: none; cursor: pointer;
+    padding: 12px 14px;
+    display: flex; align-items: center; gap: 10px;
+    transition: background 0.12s;
+  }
+  details.param-acc summary::-webkit-details-marker { display: none; }
+  details.param-acc summary:hover { background: var(--surface-warm); }
+  details.param-acc[open] summary { background: var(--accent-soft); border-bottom: 1px solid var(--accent-border); }
+  .acc-num {
+    width: 22px; height: 22px; border-radius: 6px; font-size: 11px;
+    font-family: 'DM Mono', monospace; font-weight: 600;
+    background: var(--surface-warm); color: var(--text3);
+    border: 1px solid var(--border);
+    display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  details.param-acc[open] .acc-num { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .acc-name { flex: 1; font-size: 13.5px; font-weight: 600; color: var(--text); }
+  .acc-weight { font-size: 11px; font-family: 'DM Mono', monospace; color: var(--text2); padding: 2px 8px; background: var(--surface-warm); border: 1px solid var(--border); border-radius: 999px; }
+  details.param-acc[open] .acc-weight { background: var(--surface); border-color: var(--accent-border); color: var(--accent-text); }
+  .acc-caret { color: var(--text3); transition: transform 0.2s var(--ease); flex-shrink: 0; }
+  .acc-caret svg { width: 12px; height: 12px; stroke: currentColor; stroke-width: 2; fill: none; stroke-linecap: round; }
+  details.param-acc[open] .acc-caret { transform: rotate(180deg); color: var(--accent); }
+  .acc-body {
+    padding: 12px 14px 14px; font-size: 13px; line-height: 1.55; color: var(--text);
+    animation: accOpen 0.2s var(--ease);
+  }
+  @keyframes accOpen { from { opacity: 0; transform: translateY(-3px); } to { opacity: 1; transform: translateY(0); } }
+  .acc-body ul { list-style: none; padding: 0; margin: 0; }
+  .acc-body li {
+    position: relative; padding-left: 18px; margin-bottom: 7px;
+    color: var(--text); line-height: 1.55;
+  }
+  .acc-body li:last-child { margin-bottom: 0; }
+  .acc-body li::before {
+    content: ''; position: absolute; left: 4px; top: 8px;
+    width: 5px; height: 5px; border-radius: 50%;
+    background: var(--accent);
+  }
+  .acc-note {
+    margin-top: 10px; padding: 7px 10px; font-size: 11.5px;
+    background: var(--gold-light); color: var(--gold);
+    border: 1px solid #E2D6B5; border-radius: var(--radius-sm);
+  }
+
+  /* Responsive panel behavior */
+  @media (min-width: 1100px) {
+    body.panel-open .main-area { padding-right: 436px; }
+    body.panel-open .panel-backdrop { opacity: 0; pointer-events: none; }
+  }
+  @media (max-width: 1099px) {
+    body.panel-open .panel-backdrop { opacity: 1; pointer-events: auto; }
+  }
+  @media (max-width: 700px) {
+    .chart-panel { width: 100%; border-left: none; }
+  }
+  @media (max-width: 520px) {
+    .panel-head { padding: 14px 16px; }
+    .panel-body { padding: 14px 16px 24px; }
+  }
 
   /* ---------- Objectives ---------- */
   .obj-block {
@@ -589,13 +773,19 @@
 </style>
 </head>
 <body>
+<div class="main-area">
 <div class="container">
 
   <!-- ---------- HERO ---------- -->
   <div class="hero">
     <div class="hero-pill"><span class="dot"></span> Performance review · FY 2025–26</div>
-    <h1>Your <span class="em">honest</span> review,<br/>structured.</h1>
-    <p>Submit your self-assessment or a manager review for the current period. Ratings use a weighted 1–5 scale across ten parameters — with automatic overall calculation and a clear rating band.</p>
+    <h1>Year End <span class="em">Appraisal</span> Form</h1>
+    <p>Submit your self-assessment or a manager review for the current period. Ratings use a weighted 1–5 scale across ten parameters.</p>
+    <a href="#" class="guidance-link" id="guidance-link" style="display:none;">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg>
+      For guidance, refer to the parameter chart
+      <svg class="arr" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+    </a>
     <div class="hero-stats">
       <div class="hs"><b>10</b><span>Parameters</span></div>
       <div class="hs"><b>100%</b><span>Weighted</span></div>
@@ -882,11 +1072,165 @@
   </div>
 
 </div>
+</div>
+
+<!-- Parameter chart side panel (manager role only) -->
+<div class="panel-backdrop" id="panel-backdrop" aria-hidden="true"></div>
+<aside class="chart-panel" id="chart-panel" aria-hidden="true" role="complementary" aria-label="Parameter chart">
+  <div class="panel-head">
+    <div class="ph-ic"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg></div>
+    <div style="flex:1;">
+      <h3>Parameter chart</h3>
+      <div class="ph-sub">Reference guide for ratings</div>
+    </div>
+    <button class="panel-close" id="panel-close" aria-label="Close panel">
+      <svg viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg>
+    </button>
+  </div>
+  <div class="panel-body">
+
+    <div class="panel-scale">
+      <div class="st">Rating scale</div>
+      <div class="sr" data-r="5"><span class="sn">5</span><div><span class="sl">Top Performer.</span> Has significantly exceeded expectations and is performing well above their current position.</div></div>
+      <div class="sr" data-r="4"><span class="sn">4</span><div><span class="sl">Exceeds Expectations.</span> Has performed above average and stretched themself to achieve positive feedback and ratings.</div></div>
+      <div class="sr" data-r="3"><span class="sn">3</span><div><span class="sl">Meets Expectations.</span> Has performed on par with their colleagues, and as per expectations for their role / position.</div></div>
+      <div class="sr" data-r="2"><span class="sn">2</span><div><span class="sl">Needs Improvement.</span> Has performed below average. Focus should be placed on identifying measures to improve performance.</div></div>
+      <div class="sr" data-r="1"><span class="sn">1</span><div><span class="sl">Significantly Underperforms.</span> Has significantly underperformed in this period — a performance improvement plan should be implemented as soon as possible.</div></div>
+    </div>
+
+    <div class="panel-note">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+      <div>Please provide <strong>specific supporting instances or examples</strong> wherever you rate a team member a 4 or 5 on any of the criteria below.</div>
+    </div>
+
+    <div class="panel-section-title">Parameters &amp; assessment areas</div>
+
+    <details class="param-acc" open>
+      <summary>
+        <span class="acc-num">01</span><span class="acc-name">Chargeability</span>
+        <span class="acc-weight">40%</span>
+        <span class="acc-caret"><svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></span>
+      </summary>
+      <div class="acc-body">
+        <ul>
+          <li>If it is below 70%, Manager to provide comments to support the reasoning.</li>
+          <li>We expect a staff and senior to have a chargeability of minimum 80%.</li>
+          <li>Managers or immediate seniors to ensure the same.</li>
+          <li>Ensure internal meetings, admin, and training time are within reasonable limits or negligible.</li>
+          <li>Notification to the partner or manager if non-chargeable time is expected to be high.</li>
+          <li>If the member is under / over occupied, they have informed manager early / timely.</li>
+        </ul>
+      </div>
+    </details>
+
+    <details class="param-acc">
+      <summary><span class="acc-num">02</span><span class="acc-name">Accountability</span><span class="acc-weight">5%</span><span class="acc-caret"><svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></span></summary>
+      <div class="acc-body">
+        <ul>
+          <li>Takes ownership of their deliverables; admits mistakes.</li>
+        </ul>
+      </div>
+    </details>
+
+    <details class="param-acc">
+      <summary><span class="acc-num">03</span><span class="acc-name">Commitment</span><span class="acc-weight">5%</span><span class="acc-caret"><svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></span></summary>
+      <div class="acc-body">
+        <ul>
+          <li>Shows dedication to the firm and a passion to succeed.</li>
+          <li>Takes initiative and looks for ways to contribute beyond their core duties.</li>
+          <li>Identifies and solves problems without being prompted.</li>
+          <li>Doesn't need constant supervision or micromanagement.</li>
+          <li>Actively seeks feedback and development opportunities.</li>
+          <li>Open to change and adapts well.</li>
+          <li>Shows interest in growth within the organization rather than short-term gains.</li>
+        </ul>
+      </div>
+    </details>
+
+    <details class="param-acc">
+      <summary><span class="acc-num">04</span><span class="acc-name">Business &amp; process development</span><span class="acc-weight">5%</span><span class="acc-caret"><svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></span></summary>
+      <div class="acc-body">
+        <ul>
+          <li>Proactively contributes ideas and engages in techstorming sessions.</li>
+          <li>Identifies new opportunities to improve processes and support business growth.</li>
+        </ul>
+      </div>
+    </details>
+
+    <details class="param-acc">
+      <summary><span class="acc-num">05</span><span class="acc-name">Quality</span><span class="acc-weight">10%</span><span class="acc-caret"><svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></span></summary>
+      <div class="acc-body">
+        <ul>
+          <li>Delivers high-quality services, aligning with our top priority.</li>
+          <li>Emphasises quality delivery, allowing the recipient to focus less on correcting basic issues.</li>
+          <li>Enables managers to concentrate on critical and key areas by ensuring the rest of the work is reliable.</li>
+          <li>Adheres to established standards and working paper formats, maintaining consistency and professionalism.</li>
+        </ul>
+      </div>
+    </details>
+
+    <details class="param-acc">
+      <summary><span class="acc-num">06</span><span class="acc-name">Timeliness &amp; punctuality</span><span class="acc-weight">7.5%</span><span class="acc-caret"><svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></span></summary>
+      <div class="acc-body">
+        <ul>
+          <li>Consistently ensures punctuality in completing tasks and delivering outputs within manager-assigned timelines.</li>
+          <li>Demonstrates responsibility by planning leaves in advance, seeking approval beforehand, and communicating proactively to avoid disruption to the team.</li>
+          <li>Maintains and updates timesheets regularly and in a timely manner.</li>
+        </ul>
+      </div>
+    </details>
+
+    <details class="param-acc">
+      <summary><span class="acc-num">07</span><span class="acc-name">Communication</span><span class="acc-weight">10%</span><span class="acc-caret"><svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></span></summary>
+      <div class="acc-body">
+        <ul>
+          <li>Effective communication is crucial and involves active engagement with the entire team, timely updates regarding planned leaves, and transparent communication of any challenges or issues affecting the delivery of tasks.</li>
+          <li>Maintains respectful and professional interactions with both seniors and juniors, fostering a collaborative and supportive work environment.</li>
+          <li>Engages in effective and timely communication with the UK team.</li>
+        </ul>
+      </div>
+    </details>
+
+    <details class="param-acc">
+      <summary><span class="acc-num">08</span><span class="acc-name">Participation</span><span class="acc-weight">5%</span><span class="acc-caret"><svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></span></summary>
+      <div class="acc-body">
+        <ul>
+          <li>Demonstrates willingness to participate in all team events, trainings etc.</li>
+        </ul>
+      </div>
+    </details>
+
+    <details class="param-acc">
+      <summary><span class="acc-num">09</span><span class="acc-name">Work ethics &amp; discipline</span><span class="acc-weight">7.5%</span><span class="acc-caret"><svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></span></summary>
+      <div class="acc-body">
+        <ul>
+          <li>Demonstrates skills like professionalism and time management — filling timesheets in a genuine manner and ensuring honesty, integrity towards work.</li>
+          <li>Mindful of accurately reporting hours worked. Respects the system and does not just try to "fill the time sheets".</li>
+          <li>Instead of just clocking hours, aims to be productive and values outcomes over optics.</li>
+          <li>Understands that inflated timesheets can impact billing, client trust, or internal cost assessments.</li>
+        </ul>
+        <div class="acc-note">Note: to be assessed in conjunction with the other parameters.</div>
+      </div>
+    </details>
+
+    <details class="param-acc">
+      <summary><span class="acc-num">10</span><span class="acc-name">Team player</span><span class="acc-weight">5%</span><span class="acc-caret"><svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></span></summary>
+      <div class="acc-body">
+        <ul>
+          <li>Demonstrates strong teamwork by collaborating effectively with colleagues, maintaining a positive attitude, and contributing to collective goals.</li>
+          <li>Understands the value of team development and consistently offers support to enhance group success.</li>
+          <li>Enhances group success through shared effort and collaborates effectively with colleagues.</li>
+        </ul>
+      </div>
+    </details>
+
+  </div>
+</aside>
 
 <script>
   // ============================================================
   const SCRIPT_URL    = 'https://script.google.com/macros/s/AKfycbyNMzNUDMN2BYvc487LyzUKiKTpgP3ktcRzmTdlj3ltCqi_QunI09bMa8a05tlJ22Wx0Q/exec';
-  const VIEW_PASSWORD = 'luckmans';  
+  const VIEW_PASSWORD = 'luckmans';   // ← change this to your desired password
   // ============================================================
 
   const PARAMS = [
@@ -944,6 +1288,12 @@
   document.getElementById('lock-form').addEventListener('submit', tryUnlock);
   document.getElementById('lock-toggle').addEventListener('click', togglePasswordVisibility);
 
+  // Guidance panel wiring
+  document.getElementById('guidance-link').addEventListener('click', (e) => { e.preventDefault(); openChartPanel(); });
+  document.getElementById('panel-close').addEventListener('click', closeChartPanel);
+  document.getElementById('panel-backdrop').addEventListener('click', closeChartPanel);
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && document.body.classList.contains('panel-open')) closeChartPanel(); });
+
   ['fname','femail','fdept','frole','fperiod','freviewer'].forEach(id => {
     document.getElementById(id).addEventListener('input', updateStepper);
   });
@@ -960,7 +1310,28 @@
     document.getElementById('manager-section').style.display = role === 'manager' ? 'block' : 'none';
     document.getElementById('reviewer-field').style.display  = role === 'manager' ? 'block' : 'none';
     document.getElementById('step3-lbl').textContent = role === 'self' ? 'Self-assessment' : 'Manager rating';
+
+    // Guidance link is manager-only; panel auto-closes when switching to employee.
+    document.getElementById('guidance-link').style.display = role === 'manager' ? 'inline-flex' : 'none';
+    if (role !== 'manager') closeChartPanel();
+
     updateStepper();
+  }
+
+  function openChartPanel() {
+    const panel = document.getElementById('chart-panel');
+    const back  = document.getElementById('panel-backdrop');
+    document.body.classList.add('panel-open');
+    panel.setAttribute('aria-hidden', 'false');
+    back.setAttribute('aria-hidden', 'false');
+  }
+
+  function closeChartPanel() {
+    const panel = document.getElementById('chart-panel');
+    const back  = document.getElementById('panel-backdrop');
+    document.body.classList.remove('panel-open');
+    panel.setAttribute('aria-hidden', 'true');
+    back.setAttribute('aria-hidden', 'true');
   }
 
   function switchTab(tab, btn) {
